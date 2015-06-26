@@ -35,7 +35,7 @@ getNeighbors <- function(train.no, testInstance, dist, k){
 predict <- function(train, indices){
     spec <- train[indices, "Species"]
     counts <- count(spec)
-    head(counts[which.max(counts$freq), "Species"], 1)
+    head(counts[which.max(counts$freq), 1], 1)
 }
 
 
