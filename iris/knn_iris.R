@@ -21,11 +21,11 @@ sq_distance <- function(x, y){
 
 # Allow option of which metric to pick 
 distances <- c(eu_distance, sq_distance)
-names <- c("eu", "sq")
+names(distances) <- c("eu", "sq")
 
 # Returns indices of the k-nearest neighbors to the testInstance
 getNeighbors <- function(train.no, testInstance, dist, k){
-    distance <- distances$dist
+    distance <- distances[[dist]]
     distances <- apply(train.no, 1, function(x){distance(x, testInstance)})
     head(order(distances), k)   
 }
