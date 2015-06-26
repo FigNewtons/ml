@@ -9,13 +9,23 @@ library(dplyr)
 # Load dataset just once
 iris <- tbl_df(iris)
 
-# Euclidean Distance
-distance <- function(x, y){
+# Euclidean Metric
+eu_distance <- function(x, y){
     sqrt(sum((x - y)^2))
 }
 
+# Square Metric (Manhattan Distance)
+sq_distance <- function(x, y){
+    sum(abs(x - y))
+}
+
+# Allow option of which metric to pick 
+distances <- c(eu_distance, sq_distance)
+names <- c("eu", "sq")
+
 # Returns indices of the k-nearest neighbors to the testInstance
-getNeighbors <- function(train.no, testInstance, k){
+getNeighbors <- function(train.no, testInstance, dist, k){
+    distance <- distances$dist
     distances <- apply(train.no, 1, function(x){distance(x, testInstance)})
     head(order(distances), k)   
 }
@@ -34,7 +44,7 @@ predict <- function(train, indices){
 # > trials <- replicate(100, run())
 # > mean(trials)
 
-run <- function(k = 5){
+run <- function(k = 5, dist = "eu"){
     # Divide dataset into training and test sets (2:1)
     train <- sample_frac(iris, 2/3)
     test <- setdiff(iris, train)
@@ -44,7 +54,7 @@ run <- function(k = 5){
     test.no <- select(test, -Species)
     
     predictions <- apply(test.no, 1, function(x){
-        predict(train, getNeighbors(train.no, x, k)) })
+        predict(train, getNeighbors(train.no, x, dist, k)) })
     
     no.correct <- sum(predictions == test$Species)
     total <- nrow(test)
