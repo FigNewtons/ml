@@ -33,9 +33,10 @@ getNeighbors <- function(train.no, testInstance, dist, k){
 # Given a set of indices, returns the predicted species
 # based off simple majority of neighbor's species
 predict <- function(train, indices){
-    spec <- train[indices, "Species"]
-    counts <- count(spec)
-    head(counts[which.max(counts$freq), 1], 1)
+    spec <- group_by(train[indices, ], Species)
+    counts <- summarize(spec, Freq = n())
+    ans <- head(counts[which.max(counts$Freq), "Species"], 1)
+    ans[[1]]
 }
 
 
@@ -54,7 +55,9 @@ run <- function(k = 5, dist = "eu"){
     test.no <- select(test, -Species)
     
     predictions <- apply(test.no, 1, function(x){
-        predict(train, getNeighbors(train.no, x, dist, k)) })
+        neighbors <- getNeighbors(train.no, x, dist, k)
+        predict(train, neighbors) 
+    })
     
     no.correct <- sum(predictions == test$Species)
     total <- nrow(test)
