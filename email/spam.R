@@ -106,13 +106,15 @@ computeBayes <- function(path, training.df, prior = 0.5, c = 1e-6){
         prior * c^(length(freq))
     }else{
         # Occurence = p(features| spam) \ p(features)
-        prob.match <- training.df$occurrence[ match(word.matches, training.df$term)]
+        prob.match <- 
+            training.df$occurrence[match(word.matches, training.df$term)]
         
-        prior * prob.match * c^( length(freq) - length(word.matches))
+        prior * prod(prob.match) * c^( length(freq) - length(word.matches))
     }
     
     bayes
 }
+
 
 run <- function(){
     
@@ -120,10 +122,18 @@ run <- function(){
     spam.df <- loadEmails(spam.path) %>% createTDM %>% createWordRank
     easyham.df <- loadEmails(easyham.path) %>% createTDM %>% createWordRank
     
-    hardham <- loadEmails(hardham.path)
+    hardham <- dir(hardham.path, pattern = "^[0-9]{5}.[a-f0-9]{32}$")
     
+    spam.test <- sapply(hardham, function(p){ 
+        computeBayes(file.path(hardham.path, p), spam.df)})
     
+    ham.test <- sapply(hardham, function(p){ 
+        computeBayes(file.path(hardham.path, p), easyham.df)})
     
+    # Return true if spam prob is higher than ham prob
+    results <- ifelse(spam.test > ham.test, TRUE, FALSE)
+    
+    sum(results)
 }
 
 

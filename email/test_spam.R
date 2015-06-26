@@ -85,6 +85,23 @@ test_that("Get term count", {
 })
 
 test_that("Bayes Formula", {
+    train.path <- "test_data"
+    train.df <- loadEmails(train.path) %>% createTDM %>% createWordRank
     
+    test1.path <- "test_data/cmds"
+    test2.path <- "words"
+    
+    words <- c("wilco", "jeff", "tweedy", "duke", "silver")
+    indices <- match(words, train.df$terms)
+    occur <- train.df[indices, "occurrence"]
+    
+    prior <- 0.5
+    c <- 1
+    
+    b1 <- computeBayes(test1.path, train.df, prior, c)
+    b2 <- computeBayes(test2.path, train.df, prior, c)
+    
+    expect_equal(b1, prior)
+    expect_equal(b2, prod(occur) * prior)
     
 })
