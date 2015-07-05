@@ -3,11 +3,10 @@
 
 library(lubridate)
 library(tm)
+library(dplyr)
 
 # Global paths: Using the easyham set to train our ranker
 easyham.path <- file.path("data", "easy_ham")
-
-
 
 # Give file path, returns entire email content
 getContent <- function(path){
@@ -68,8 +67,24 @@ getMessage <- function(content){
     return(paste(msg, collapse = "\n"))
 }
 
+# Given directory path, returns all parsed emails as a data frame
+loadEmails <- function(mail.path){
+    mail.list <- dir(mail.path)
+    mail.list <- mail.list[which(mail.list != "cmds")]
+    
+    parsed.mail <- sapply(mail.list, function(p){ 
+        getContent( paste(mail.path, p, sep = "/")) %>% parseEmail})
+    
+    feature.df <- as.data.frame(t(parsed.mail))
+    feature.df <- tbl_df(feature.df)
+    names(feature.df) <- c("Date", "From.Email", "Subject", "Message")
+    
+}
+
+
+
+
 run <- function(){
     
-    # getContent %>% parseEmail
-    
+ 
 }
