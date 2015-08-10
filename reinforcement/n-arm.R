@@ -20,9 +20,11 @@ egreedy <- function(n = 10, times = 200, epsilon = 0.01){
         
         # Update values to reflect choice    
         total_reward <- total_reward + reward
-        obs <- counts[choice]
-        averages[choice] <- (obs * averages[choice] + reward) / (obs + 1)
-        counts[choice] <- counts[choice] + 1    
+        counts[choice] <- counts[choice] + 1 
+        
+        # Update rule: Q_{k + 1} = Q_{k} + (r_{k + 1} - Q_{k}) / (k + 1)
+        averages[choice] <- 
+            averages[choice] + (reward - averages[choice]) / counts[choice]
     }
     
     total_reward
@@ -47,9 +49,11 @@ softmax <- function(n = 10, times = 200, temp = 0.50){
         
         # Update everything else
         total_reward <- total_reward + reward
-        obs <- counts[choice]
-        averages[choice] <- (obs * averages[choice] + reward) / (obs + 1)
-        counts[choice] <- counts[choice] + 1    
+        counts[choice] <- counts[choice] + 1 
+        
+        # Update rule: Q_{k + 1} = Q_{k} + (r_{k + 1} - Q_{k}) / (k + 1)
+        averages[choice] <- 
+            averages[choice] + (reward - averages[choice]) / counts[choice]  
     }
     
     total_reward
